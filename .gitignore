@@ -1,0 +1,5 @@
+build/
+*.AppImage
+__pycache__/
+*.pyc
+*.rd
