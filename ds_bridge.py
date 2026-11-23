@@ -149,7 +149,7 @@ class Pad:
     def get_feature(self, rnum):
         src = rnum
         if self.kind == "ds4":
-            src = {0x02: 0x05, 0x81: 0x09}.get(rnum, rnum)
+            src = {0x02: 0x05, 0x12: 0x09, 0x81: 0x09}.get(rnum, rnum)
         n = FEATURE_LEN.get((self.kind, src), 64)
         buf = bytearray(n)
         buf[0] = src
@@ -160,6 +160,7 @@ class Pad:
             return 5, b""  # EIO
         rep = bytearray(buf[:got])
         rep[0] = rnum
+        if self.kind == "ds4" and rnum in (0x12, 0x81) and len(rep) > 1: rep[1] ^= 0x01  # MAC distinta: hid-playstation rechaza MAC duplicada
         if self.kind == "ds4" and rnum == 0x02:
             rep = rep[:37]  # tamaño USB
         return 0, bytes(rep)

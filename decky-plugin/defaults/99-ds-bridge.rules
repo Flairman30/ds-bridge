@@ -1,0 +1,16 @@
+# ds-bridge: acceso sin root a /dev/uhid y a los hidraw de mandos Sony (BT y USB).
+# TAG+="uaccess" da ACL al usuario con sesión activa (deck, también en Modo Gaming).
+
+KERNEL=="uhid", SUBSYSTEM=="misc", MODE="0660", TAG+="uaccess"
+
+# Bluetooth (bus 0005)
+SUBSYSTEM=="hidraw", KERNELS=="0005:054C:05C4.*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNELS=="0005:054C:09CC.*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNELS=="0005:054C:0CE6.*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNELS=="0005:054C:0DF2.*", MODE="0660", TAG+="uaccess"
+
+# USB (bus 0003): mandos físicos por cable y el dispositivo UHID virtual
+SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNELS=="0003:054C:09CC.*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNELS=="0003:054C:0CE6.*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNELS=="0003:054C:0DF2.*", MODE="0660", TAG+="uaccess"

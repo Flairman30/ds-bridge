@@ -1,0 +1,11 @@
+{
+  "name": "DS Bridge",
+  "author": "Flairman30",
+  "flags": ["root"],
+  "api_version": 1,
+  "publish": {
+    "tags": ["controller", "bluetooth", "dualshock4", "dualsense", "experimental"],
+    "description": "Experimental Bluetooth to virtual-USB bridge for DualShock 4 / DualSense.",
+    "image": ""
+  }
+}
