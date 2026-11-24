@@ -120,6 +120,7 @@ class Pad:
         self.seq = 0
         self.last_usb_out = None
         self.trig = {}  # side -> 11 bytes anclados
+        self.batt = None  # {"pct": int, "charging": bool} (solo DS4, aproximado)
         # Leer el feature report de calibración hace que el mando pase de los reports
         # "simplificados" (0x01) a los completos (DS4: 0x11, DS5: 0x31) por Bluetooth.
         self.get_feature(0x02 if self.kind == "ds4" else 0x05)
@@ -204,6 +205,11 @@ class Pad:
             usb = b"\x01" + d[3:66]
         elif self.kind == "ds5" and d[:1] == b"\x31" and len(d) >= 65:
             usb = b"\x01" + d[2:65]
+        if usb and self.kind == "ds4" and len(usb) > 30:
+            lvl = usb[30] & 0x0F
+            cable = bool(usb[30] & 0x10)
+            pct = 100 if lvl >= 11 else min(lvl * 100 // 8, 100)
+            self.batt = {"pct": pct, "charging": cable and lvl < 11}
         if usb:
             self._uhid_write(UHID_INPUT2, struct.pack("<H", len(usb)) + usb)
 
@@ -368,7 +374,7 @@ def effect_bytes(c):
 def handle_ctl(cmd, pads):
     c = cmd.get("cmd")
     if c == "status":
-        return {"pads": [{"path": p.path, "kind": p.kind, "pinned": list(p.trig)} for p in pads.values()]}
+        return {"pads": [{"path": p.path, "kind": p.kind, "pinned": list(p.trig), "battery": p.batt} for p in pads.values()]}
     if c == "trigger":
         pl = effect_bytes(cmd)
         n = sum(p.set_trigger(cmd["side"], pl) for p in pads.values())
